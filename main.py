@@ -22,7 +22,8 @@ def main():
             exit(1)
         keystone_client = Keystone(auth_url=constants.ADMIN_AUTH_URL, user_name=user_name,
                                    password=user_password, project_name=project_name,
-                                   project_description=project_description)
+                                   project_description=project_description,
+                                   type="New")
         #print keystone_client.project_id
         if keystone_client is None:
             print "here"
