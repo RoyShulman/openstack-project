@@ -1,6 +1,7 @@
 import easygui
 from keystone_functions import Keystone
 
+#TODO: watch keystone endpoint again because of regions
 
 def main():
     title = "Openstack Virtualization Platform"
@@ -16,7 +17,7 @@ def main():
         user_name = easygui.enterbox(msg="Create a user name")
         if user_name is None:
             exit(1)
-        user_password = easygui.enterbox(msg="Create a password")
+        user_password = easygui.passwordbox(msg="Create a password")
         if user_password is None:
             exit(1)
         keystone_client = Keystone(user_name=user_name,
