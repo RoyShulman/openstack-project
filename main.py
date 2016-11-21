@@ -1,6 +1,5 @@
 import easygui
 from keystone_functions import Keystone
-import constants
 
 
 def main():
@@ -22,8 +21,7 @@ def main():
             exit(1)
         keystone_client = Keystone(user_name=user_name,
                                    password=user_password, project_name=project_name,
-                                   project_description=project_description,
-)
+                                   project_description=project_description)
         #print keystone_client.project_id
         if keystone_client is None:
             easygui.msgbox("Error!\nProject with this name already exists")

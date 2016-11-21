@@ -45,7 +45,3 @@ class Keystone:
         self.keystone_client.users.create(name=name, password=password, tenant_id=project_id)
 
 
-if __name__ == "__main__":
-    a = Keystone("a","A","a","A", "second project")
-    print a.project_id
-
