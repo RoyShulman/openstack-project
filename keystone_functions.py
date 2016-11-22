@@ -1,4 +1,4 @@
-from keystoneclient.v2_0 import client
+from keystoneclient.v2_0 import client as keystoneClient
 from keystoneauth1.identity import v2
 from keystoneauth1 import session
 from keystoneauth1 import exceptions
@@ -39,10 +39,10 @@ class Keystone:
 
     def password_login(self, auth_url=constants.ADMIN_AUTH_URL, username=constants.ADMIN_USERNAME,
                        password=constants.ADMIN_PASSWORD, project_name=constants.ADMIN_TENANT):
-        """return a keystone client by authenticating with password"""
+        """return a keystone keystoneClient by authenticating with password"""
         auth = v2.Password(auth_url=auth_url, username=username, password=password, tenant_name=project_name)
         sess = session.Session(auth=auth)
-        keystone_client = client.Client(session=sess)
+        keystone_client = keystoneClient.Client(session=sess)
         #check if authenticated successfully
         try:
             keystone_client.users.list()
