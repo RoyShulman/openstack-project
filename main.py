@@ -2,6 +2,7 @@ import easygui
 from keystone_functions import Keystone
 
 #TODO: watch keystone endpoint again because of regions
+#TODO: check if any user can see all glance images and how keystone works with nova
 
 def main():
     title = "Openstack Virtualization Platform"
