@@ -1,8 +1,8 @@
 import easygui
 from keystone_functions import Keystone
+from glance_functions import Glance
 
 #TODO: watch keystone endpoint again because of regions
-#TODO: check if any user can see all glance images and how keystone works with nova
 
 def main():
     title = "Openstack Virtualization Platform"
@@ -28,7 +28,7 @@ def main():
         if keystone_client is None:
             easygui.msgbox("Error!\nProject with this name already exists")
     elif button == "Existing project":
-        project_name = easygui.enterbox(msg="Enter your new project name")
+        project_name = easygui.enterbox(msg="Enter your project name")
         if project_name is None:
             exit(1)
         user_name = easygui.enterbox(msg="Enter your username")
@@ -40,6 +40,12 @@ def main():
         keystone_client = Keystone(user_name=user_name,
                                    password=user_password,
                                    project_name=project_name)
+        glance_client = Glance(keystone_client.sess)
+        images = glance_client.list_images()
+        for image in images:
+            print image
+
+        glance_client.delete_image("86bd758e-e814-4c8e-9cb8-c53a98f546a6")
 
 
 

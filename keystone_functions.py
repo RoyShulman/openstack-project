@@ -8,6 +8,8 @@ import constants
 
 class Keystone:
     def __init__(self, user_name, password, project_name, project_description = None):
+        #session to be used inside keystone
+        self.sess = None
         if project_description is not None:
             #User wants to create a new project
             self.keystone_client = self.password_login()
@@ -41,8 +43,8 @@ class Keystone:
                        password=constants.ADMIN_PASSWORD, project_name=constants.ADMIN_TENANT):
         """return a keystone keystoneClient by authenticating with password"""
         auth = v2.Password(auth_url=auth_url, username=username, password=password, tenant_name=project_name)
-        sess = session.Session(auth=auth)
-        keystone_client = keystoneClient.Client(session=sess)
+        self.sess = session.Session(auth=auth)
+        keystone_client = keystoneClient.Client(session=self.sess)
         #check if authenticated successfully
         try:
             keystone_client.users.list()

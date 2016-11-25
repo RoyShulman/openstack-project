@@ -13,3 +13,6 @@ ADMIN_TENANT = "admin"
 KEYSTONE_API_VERSION = 'v2.0'
 ADMIN_PORT = '35357'
 CONTROLLER_IP = '192.168.1.154'
+
+#WGETS
+CIRROS_VM_IMAGE = "http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img"
