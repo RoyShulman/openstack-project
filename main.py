@@ -27,6 +27,12 @@ def main():
         #print keystone_client.project_id
         if keystone_client is None:
             easygui.msgbox("Error!\nProject with this name already exists")
+            exit(1)
+        glance_client = Glance(keystone_session=keystone_client.sess)
+        glance_client.add_default_images()
+        if glance_client.list_images() is None:
+            easygui.msgbox("Error!\nInstalling images unsuccessful")
+            exit(1)
     elif button == "Existing project":
         project_name = easygui.enterbox(msg="Enter your project name")
         if project_name is None:

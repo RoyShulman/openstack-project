@@ -14,5 +14,7 @@ KEYSTONE_API_VERSION = 'v2.0'
 ADMIN_PORT = '35357'
 CONTROLLER_IP = '192.168.1.154'
 
-#WGETS
-CIRROS_VM_IMAGE = "http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img"
+#IMAGE URLS
+IMAGE_URLS = {"IRROS_VM_IMAGE":"http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img",
+              "CENT_OS_IMAGE":"http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2",
+              "UBUNTU_SERVER_IMAGE": "http://releases.ubuntu.com/16.04/ubuntu-16.04.1-server-i386.img"}
