@@ -1,6 +1,7 @@
 import easygui
 from keystone_functions import Keystone
 from glance_functions import Glance
+from nova_functions import Nova
 
 #TODO: watch keystone endpoint again because of regions
 
@@ -28,6 +29,7 @@ def main():
         if keystone_client is None:
             easygui.msgbox("Error!\nProject with this name already exists")
             exit(1)
+
         glance_client = Glance(keystone_session=keystone_client.sess)
         glance_client.add_default_images()
         if glance_client.list_images() is None:
@@ -50,7 +52,6 @@ def main():
         images = glance_client.list_images()
         image_names = create_image_choiceboxes(images=images)
         easygui.choicebox("Pick an image", choices=image_names)
-
 
 
 def create_image_choiceboxes(images):
