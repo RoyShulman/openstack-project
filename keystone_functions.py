@@ -50,6 +50,9 @@ class Keystone:
             keystone_client.users.list()
         except exceptions.http.Unauthorized:
             return None
+        except exceptions.connection.ConnectFailure:
+            easygui.msgbox("Error!\nCould not establish conection to keystone service")
+            exit(1)
         return keystone_client
 
     def add_user(self, name, password, project_id):

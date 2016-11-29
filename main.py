@@ -48,12 +48,14 @@ def main():
                                    project_name=project_name)
         glance_client = Glance(keystone_client.sess)
         images = glance_client.list_images()
-        for image in images:
-            print image
-
-        glance_client.delete_image("86bd758e-e814-4c8e-9cb8-c53a98f546a6")
+        image_names = create_image_choiceboxes(images=images)
+        easygui.choicebox("Pick an image", choices=image_names)
 
 
+
+def create_image_choiceboxes(images):
+    image_names = [x.name for x in images]
+    return image_names
 
 if __name__ == "__main__":
     main()
