@@ -52,7 +52,10 @@ class Keystone:
             return None
         except exceptions.connection.ConnectFailure:
             easygui.msgbox("Error!\nCould not establish conection to keystone service")
-            exit(1)
+            return None
+        except exceptions.catalog.EmptyCatalog:
+            easygui.msgbox("Could not connect to service endpoint! contact system admin!")
+            return None
         return keystone_client
 
     def add_user(self, name, password, project_id):

@@ -2,7 +2,6 @@ import easygui
 from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
-
 #TODO: watch keystone endpoint again because of regions
 
 def main():
