@@ -30,7 +30,7 @@ def main():
             exit(1)
 
         glance_client = Glance(keystone_session=keystone_client.sess)
-        glance_client.add_default_images()
+        #glance_client.add_default_images() takes wayyyy too long
         if glance_client.list_images() is None:
             easygui.msgbox("Error!\nInstalling images unsuccessful")
             exit(1)
@@ -49,13 +49,29 @@ def main():
                                    project_name=project_name)
         glance_client = Glance(keystone_client.sess)
         images = glance_client.list_images()
+        for image in images:
+            print image.id
+        images = glance_client.list_images()
+        for image in images:
+            print image.name
         image_names = create_image_choiceboxes(images=images)
-        easygui.choicebox("Pick an image", choices=image_names)
+        chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
+        for image in images:
+            print image.id
+        chosen_image_id = get_image_id(images=images, image_name=chosen_image_name)
+        print glance_client.get_image(image_id=chosen_image_id)
+
+
 
 
 def create_image_choiceboxes(images):
     image_names = [x.name for x in images]
     return image_names
+
+def get_image_id(images, image_name):
+    for image in images:
+        if image.name == image_name:
+            return image.id
 
 if __name__ == "__main__":
     main()
