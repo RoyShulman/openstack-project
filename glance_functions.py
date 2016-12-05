@@ -3,6 +3,7 @@ import urllib2
 import easygui
 import constants
 
+#NOTE TO SELF: all images have --is-public set to True because upload time takes very long
 
 class Glance:
     def __init__(self, keystone_session):

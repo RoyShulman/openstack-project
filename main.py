@@ -2,7 +2,7 @@ import easygui
 from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
-#TODO: watch keystone endpoint again because of regions
+#TODO: check how to sort images by user
 
 def main():
     title = "Openstack Virtualization Platform"
@@ -48,17 +48,9 @@ def main():
                                    password=user_password,
                                    project_name=project_name)
         glance_client = Glance(keystone_client.sess)
-        images = glance_client.list_images()
-        for image in images:
-            print image.id
-        images = glance_client.list_images()
-        for image in images:
-            print image.name
-        image_names = create_image_choiceboxes(images=images)
+        image_names = create_image_choiceboxes(images=glance_client.list_images())
         chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
-        for image in images:
-            print image.id
-        chosen_image_id = get_image_id(images=images, image_name=chosen_image_name)
+        chosen_image_id = get_image_id(glance_client=glance_client, image_name=chosen_image_name)
         print glance_client.get_image(image_id=chosen_image_id)
 
 
@@ -68,7 +60,8 @@ def create_image_choiceboxes(images):
     image_names = [x.name for x in images]
     return image_names
 
-def get_image_id(images, image_name):
+def get_image_id(glance_client, image_name):
+    images = glance_client.list_images()
     for image in images:
         if image.name == image_name:
             return image.id
