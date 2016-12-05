@@ -60,7 +60,11 @@ class Keystone:
 
     def add_user(self, name, password, project_id):
         """function to add a new user to a project"""
-        user_id = self.keystone_client.users.create(name=name, password=password, tenant_id=project_id)
+        try:
+            user_id = self.keystone_client.users.create(name=name, password=password, tenant_id=project_id)
+        except exceptions.http.Conflict:
+            easygui.msgbox("Username already taken!")
+            exit(1)
         return user_id
 
     def add_role(self, project_id, user_id):
