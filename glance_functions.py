@@ -17,6 +17,9 @@ class Glance:
                                                  container_format="bare")
         self.glance_client.images.upload(image.id, vm_image.read())
 
+    def get_image(self, image_id):
+        return self.glance_client.images.get(image_id)
+
     def list_images(self):
         return self.glance_client.images.list()
 
@@ -26,6 +29,7 @@ class Glance:
     def add_default_images(self):
         for image_name in constants.IMAGE_URLS:
             vm_image = urllib2.urlopen(constants.IMAGE_URLS[image_name])
+            print "adding image: ", image_name
             image = self.glance_client.images.create(name=image_name, disk_format="qcow2",
                                                      container_format="bare")
             self.glance_client.images.upload(image.id, vm_image.read())
