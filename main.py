@@ -2,7 +2,7 @@ import easygui
 from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
-#TODO: check how to sort images by user
+#TODO: add more functions to shorten main
 
 def main():
     title = "Openstack Virtualization Platform"
@@ -47,14 +47,9 @@ def main():
         keystone_client = Keystone(user_name=user_name,
                                    password=user_password,
                                    project_name=project_name)
-        glance_client = Glance(keystone_client.sess)
+        glance_client = Glance(keystone_session=keystone_client.sess)
         image_names = create_image_choiceboxes(images=glance_client.list_images())
         chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
-        chosen_image_id = get_image_id(glance_client=glance_client, image_name=chosen_image_name)
-        print glance_client.get_image(image_id=chosen_image_id)
-
-
-
 
 def create_image_choiceboxes(images):
     image_names = [x.name for x in images]
