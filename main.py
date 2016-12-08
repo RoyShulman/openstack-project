@@ -4,6 +4,7 @@ from glance_functions import Glance
 from nova_functions import Nova
 #TODO: add more functions to shorten main
 
+
 def main():
     title = "Openstack Virtualization Platform"
     choices = ["New project", "Existing project"]
@@ -30,10 +31,11 @@ def main():
             exit(1)
 
         glance_client = Glance(keystone_session=keystone_client.sess)
-        #glance_client.add_default_images() takes wayyyy too long
+        glance_client.create_image()
         if glance_client.list_images() is None:
             easygui.msgbox("Error!\nInstalling images unsuccessful")
             exit(1)
+
     elif button == "Existing project":
         project_name = easygui.enterbox(msg="Enter your project name")
         if project_name is None:
@@ -51,15 +53,18 @@ def main():
         image_names = create_image_choiceboxes(images=glance_client.list_images())
         chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
 
+
 def create_image_choiceboxes(images):
     image_names = [x.name for x in images]
     return image_names
+
 
 def get_image_id(glance_client, image_name):
     images = glance_client.list_images()
     for image in images:
         if image.name == image_name:
             return image.id
+
 
 if __name__ == "__main__":
     main()

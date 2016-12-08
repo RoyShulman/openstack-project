@@ -11,9 +11,13 @@ class Glance:
 
     def create_image(self):
         #add options for different images
-        image_url = easygui.enterbox(msg="Enter the image url")
-        vm_image = urllib2.urlopen(image_url)
-        image_name = easygui.enterbox(msg="Enter the image name")
+        image_url = easygui.enterbox(msg="Enter the image url(Nothing for the default)")
+        if image_url == "":#user wants to add the default images
+            vm_image = urllib2.urlopen(constants.IMAGE_URLS["CIRROS_VM_IMAGE"])
+            image_name = "CIRROS_VM_IMAGE"
+        else:
+            vm_image = urllib2.urlopen(image_url)
+            image_name = easygui.enterbox(msg="Enter the image name")
         image = self.glance_client.images.create(name=image_name, disk_format="qcow2",
                                                  container_format="bare")
         self.glance_client.images.upload(image.id, vm_image.read())
