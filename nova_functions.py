@@ -43,7 +43,7 @@ class Nova:
     def create_security_group(self):
         #default security group
         security_group = self.nova_client.security_groups.find(name="default")
-        self.nova_client.security_groups.create(security_group.id, ip_protocol="tcp",
+        self.nova_client.security_groups_rules.create(security_group.id, ip_protocol="tcp",
                                                 from_port=22, to_port=22)#SSH
-        self.nova_client.security_groups.create(security_group.id, ip_protocol="icmp",
+        self.nova_client.security_groups_rules.create(security_group.id, ip_protocol="icmp",
                                                 from_port=-1, to_port=-1)#ICMP
