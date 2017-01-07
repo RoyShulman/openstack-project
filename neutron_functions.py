@@ -9,14 +9,9 @@ class Neutron:
     def list_networks(self):
         return self.neutron_client.list_networks()
 
-    def create_external_network(self):
-        self.neutron_client.create_ext()#TODO:work on this
+    def create_network(self, network_name, is_external, network_type):
+        network = {'name': network_name, 'router:external': is_external, 'provider:network_type':network_type}
+        self.neutron_client.create_network({'network':network})
 
-    def reset_network(self):
-        """1. router gateway clear
-           2. router interface delete subnets
-           3. router delete
-           4. delete all floating ips
-           5. delete subnets
-           6. delete netsg
-        """
+    def delete_network(self, network_id):
+        self.neutron_client.delete_network(network=network_id)

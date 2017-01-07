@@ -1,4 +1,5 @@
 from novaclient import client as novaClient
+from neutron_functions import  Neutron
 import constants
 import os
 import time
@@ -8,7 +9,7 @@ import easygui
 class Nova:
     def __init__(self, keystone_session):
         self.nova_client = novaClient.Client(version="2", session=keystone_session, auth_url=constants.ADMIN_AUTH_URL)
-
+        self.neutron_client = Neutron(session=keystone_session)
     def list_images(self):
         try:
             return self.nova_client.images.list()
@@ -39,7 +40,9 @@ class Nova:
             status = instance.status
             print "Building"
 
-        instance.add_floating_ip()#TODO: add function to add a floating ip
+        floating_ip = self.create_floating_ip()
+
+        instance.add_floating_ip(floating_ip)
         print "Finished!"
 
     def create_security_group(self):
@@ -58,3 +61,6 @@ class Nova:
             exit(1)
         else:
             return instance_id
+
+    def create_floating_ip(self):
+        return self.nova_client.floating_ips.create()

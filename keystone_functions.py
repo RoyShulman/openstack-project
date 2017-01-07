@@ -67,8 +67,13 @@ class Keystone:
             exit(1)
         return user_id
 
-    def add_role(self, project_id, user_id):
+    def add_admin_role(self, project_id, user_id):
         admin_role = [x.id for x in self.keystone_client.roles.list() if x.name == "admin"][0]
         role = self.keystone_client.roles.add_user_role(user=user_id, role=admin_role, tenant=project_id)
         return role
+
+    def list_projects(self):
+        #function to list on tenants(projects)
+        return keystoneClient.tenants.list()
+
 
