@@ -2,7 +2,8 @@ import easygui
 from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
-#TODO: add more functions to shorten main
+from swift_functions import Swift
+
 
 
 def main():
