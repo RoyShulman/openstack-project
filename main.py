@@ -27,10 +27,9 @@ def main():
                                    password=user_password, project_name=project_name,
                                    project_description=project_description)
         #print keystone_client.project_id
-        if keystone_client is None:
-            easygui.msgbox("Error!\nProject with this name already exists")
-            exit(1)
-
+        exit = False
+        while not exit:
+            choices = ["Create a Virtual Machine" ,"Upload A File", "List Files", ]
         glance_client = Glance(keystone_session=keystone_client.sess)
         glance_client.create_image()
         if glance_client.list_images() is None:
@@ -51,6 +50,8 @@ def main():
                                    password=user_password,
                                    project_name=project_name)
         glance_client = Glance(keystone_session=keystone_client.sess)
+        nova_client = Nova(keystone_session=keystone_client.sess)
+        easygui.msgbox(nova_client.get_novnc_url("demo-instanc") + "\nIf you see Controller Replace with 10.10.10.51")
         image_names = create_image_choiceboxes(images=glance_client.list_images())
         chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
 

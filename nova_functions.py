@@ -9,10 +9,11 @@ import easygui
 class Nova:
     def __init__(self, keystone_session):
         self.nova_client = novaClient.Client(version="2", session=keystone_session, auth_url=constants.ADMIN_AUTH_URL)
-        self.neutron_client = Neutron(session=keystone_session)
-    def list_images(self):
+        self.neutron_client = Neutron(keystone_session=keystone_session)
+
+    def list_servers(self):
         try:
-            return self.nova_client.images.list()
+            return self.nova_client.servers.list()
         except Exception,e:
             print e
 
@@ -55,12 +56,16 @@ class Nova:
         return security_group
 
     def get_instance(self, instance_name):
-        instance_id= [x.id for x in self.list_images() if x.name == instance_name]
+        instance_id = [x.id for x in self.list_servers() if x.name == instance_name]
         if instance_id == []:
             easygui.msgbox("Instance name could not be found")
             exit(1)
         else:
-            return instance_id
+            return instance_id[0]
 
     def create_floating_ip(self):
         return self.nova_client.floating_ips.create()
+
+    def get_novnc_url(self, instance_name):
+        instance_id = self.get_instance(instance_name=instance_name)
+        return self.nova_client.servers.get_vnc_console(instance_id, 'novnc')
