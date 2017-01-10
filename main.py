@@ -51,7 +51,7 @@ def main():
                                    project_name=project_name)
         glance_client = Glance(keystone_session=keystone_client.sess)
         nova_client = Nova(keystone_session=keystone_client.sess)
-        easygui.msgbox(nova_client.get_novnc_url("demo-instanc") + "\nIf you see Controller Replace with 10.10.10.51")
+        easygui.msgbox(str(nova_client.get_novnc_url("demo-instanc")) + "\n\n\nIF YOU SEE CONTROLLER REPLACE WITH 10.10.10.51")
         image_names = create_image_choiceboxes(images=glance_client.list_images())
         chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
 

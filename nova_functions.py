@@ -6,6 +6,7 @@ import time
 import easygui
 
 
+
 class Nova:
     def __init__(self, keystone_session):
         self.nova_client = novaClient.Client(version="2", session=keystone_session, auth_url=constants.ADMIN_AUTH_URL)
@@ -68,4 +69,4 @@ class Nova:
 
     def get_novnc_url(self, instance_name):
         instance_id = self.get_instance(instance_name=instance_name)
-        return self.nova_client.servers.get_vnc_console(instance_id, 'novnc')
+        return self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]
