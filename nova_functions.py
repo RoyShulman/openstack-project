@@ -83,7 +83,7 @@ class Nova:
 
     def get_instance_IP(self, instance_name):
         instance_id = self.get_instance(instance_name=instance_name)
-        instace = self.nova_client.servers.get(instance_id)
+        instance = self.nova_client.servers.get(instance_id)
         if instance_id == None:
             return
         return instance.servers.networks
