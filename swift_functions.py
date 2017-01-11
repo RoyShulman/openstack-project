@@ -2,18 +2,19 @@ from swiftclient import client as SwiftClient
 from swiftclient import ClientException
 import easygui
 from exceptions import IOError
+import os
 class Swift:
     def __init__(self, keystone_session):
-        self.upload_file('b.txt')
         self.swift_client = SwiftClient.Connection(session=keystone_session)
         self.account = self.swift_client.get_account()
-        self.container = self.account[1]
+        self.container = self.account[1][0]
 
     def upload_file(self, file):
         try:
             with open(file, 'r') as file_to_upload:
+                    file_name = file.split("/")[-1]
                     self.swift_client.put_object(container=self.container['name'],
-                                                 obj=file,
+                                                 obj=file_name,
                                                  contents=file_to_upload.read(),
                                                  content_type='text/plain')
         except IOError as error:
@@ -25,8 +26,14 @@ class Swift:
             return
 
     def list_files(self):
+        return_files = []
         try:
-            return self.swift_client.get_container(self.container['name'])[1]
+            files = self.swift_client.get_container(self.container['name'])[1]
+            for file in files:
+                return_files.append(file["name"])
+
+            s = " ".join(return_files)
+            easygui.msgbox(str(s))
         except ClientException:
             easygui.msgbox("Error!\nFailed to complete request")
         finally:
@@ -38,7 +45,7 @@ class Swift:
         except ClientException:
             easygui.msgbox("Error!\nFailed to complete request")
             return
-        with open(file_name + ".txt", 'w') as new_file:
+        with open(os.path.expanduser("~") + "/" + file_name, 'w') as new_file:
             new_file.write(file)
 
     def delete_file(self, file_name):

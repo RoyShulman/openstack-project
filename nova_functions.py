@@ -22,10 +22,6 @@ class Nova:
         instance = self.nova_client.servers.find(name=instance_name)
         instance.delete()
 
-    def get_instance(self, instance_id):
-        instance = self.nova_client.servers.find(id=instance_id)
-        return instance
-
     def create_instance(self, image_name, instance_name, security_group_name):
         if not self.nova_client.keypairs.findall(name="mykey"):
             with open(os.path.expanduser('~/.ssh/id_rsa.pub')) as fpubkey:
@@ -71,7 +67,7 @@ class Nova:
         instance_id = [x.id for x in self.list_servers() if x.name == instance_name]
         if instance_id == []:
             easygui.msgbox("Instance name could not be found")
-            exit(1)
+            return None
         else:
             return instance_id[0]
 
@@ -81,4 +77,6 @@ class Nova:
 
     def get_novnc_url(self, instance_name):
         instance_id = self.get_instance(instance_name=instance_name)
+        if instance_id == None:
+            return
         return self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]

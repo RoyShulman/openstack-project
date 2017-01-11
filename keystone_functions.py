@@ -22,7 +22,7 @@ class Keystone:
                                                                  description=project_description).id
                 #create the user associated with the tenant
                 user_id = self.add_user(name=user_name, password=password, project_id=project_id)
-                role = self.add_role(project_id=project_id, user_id=user_id)
+                role = self.add_admin_role(project_id=project_id, user_id=user_id)
         else:
             #user wants to login to an existing project with his user name
             self.keystone_client = self.password_login(auth_url=constants.ADMIN_AUTH_URL,

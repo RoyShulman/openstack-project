@@ -8,9 +8,12 @@ from swift_functions import Swift
 
 def main():
     while True:
+        exit = False
         title = "Openstack Virtualization Platform"
-        choices = ["New project", "Existing project"]
+        choices = ["New project", "Existing project", "Exit"]
         button = easygui.buttonbox("Choose an option", title=title, choices=choices)
+        if button == "Exit":
+            exit(1)
         if button == "New project":
             project_name = easygui.enterbox(msg="Enter your new project name")
             if project_name is None:
@@ -40,25 +43,53 @@ def main():
                                        password=user_password, project_name=project_name,
                                        project_description=project_description)
             glance_client = Glance(keystone_session=keystone_client.sess)
+            swift_client = Swift(keystone_session=keystone_client.sess)
             #print keystone_client.project_id
-            exit = False
+
             while not exit:
                 choices = ["Create A Virtual Machine" "Access Virtual Machine" ,"Upload A File",
-                           "List Files", "Download A File"]
-                easygui.buttonbox(msg="What do you want to do?", choices=choices)
+                           "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
+                button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
+                if button == "Exit":
+                    exit = True
+                    break
                 if button == "Create A Virtual Machine":
                     if create_virtual_machine(glance_client, nova_client) is None:
                         easygui.msgbox("Failed to create virtual machine")
                         continue
                 elif button == "Access Virtual Machine":
                     instance = choose_instance(nova_client)
-                    easygui.msgbox(title="Instance URL", msg=nova_client.get_novnc_url(instance_name=instance))
-            glance_client.create_image()
-            if glance_client.list_images() is None:
-                easygui.msgbox("Error!\nInstalling images unsuccessful")
-                continue
-
-
+                    url = nova_client.get_novnc_url(instance_name=instance)
+                    if url == None:
+                        continue
+                    easygui.msgbox(title="Instance URL", msg=url)
+                    continue
+                elif button == "Upload A File":
+                    file_path = easygui.enterbox("Please enter the full file path")
+                    if file_path is None:
+                        easygui.msgbox("Enter enter a file path next time")
+                        continue
+                    swift_client.upload_file(file_path)
+                    continue
+                elif button == "List Files":
+                    swift_client.list_files()
+                    continue
+                elif button == "Delete File":
+                    file_to_deleted = easygui.enterbox("Please the name for file to delete")
+                    if file_to_deleted is None:
+                        easygui.msgbox("Enter a file next time please")
+                        continue
+                    swift_client.delete_file(file_to_deleted)
+                    continue
+                elif button == "Download A File":
+                    file_name = easygui.enterbox("Please enter the file name you want to download")
+                    if file_name is None:
+                        easygui.msgbox("Please enter a file name next time")
+                        continue
+                    swift_client.get_file(file_name)
+                    continue
+        if exit:
+            continue
 
 
         elif button == "Existing project":
@@ -74,14 +105,57 @@ def main():
             if user_password is None:
                 easygui.msgbox("Please enter your password next time")
                 continue
+
+
             keystone_client = Keystone(user_name=user_name,
                                        password=user_password,
                                        project_name=project_name)
             glance_client = Glance(keystone_session=keystone_client.sess)
             nova_client = Nova(keystone_session=keystone_client.sess)
-            easygui.msgbox(nova_client.create_floating_ip())
-            image_names = create_image_choiceboxes(images=glance_client.list_images())
-            chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
+            swift_client = Swift(keystone_session=keystone_client.sess)
+
+            while not exit:
+                choices = ["Create A Virtual Machine" "Access Virtual Machine" ,"Upload A File",
+                           "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
+                button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
+                if button == "Exit":
+                    exit = True
+                    break
+                if button == "Create A Virtual Machine":
+                    if create_virtual_machine(glance_client, nova_client) is None:
+                        easygui.msgbox("Failed to create virtual machine")
+                        continue
+                elif button == "Access Virtual Machine":
+                    instance = choose_instance(nova_client)
+                    url = nova_client.get_novnc_url(instance_name=instance)
+                    if url == None:
+                        continue
+                    easygui.msgbox(title="Instance URL", msg=url)
+                    continue
+                elif button == "Upload A File":
+                    file_path = easygui.enterbox("Please enter the full file path")
+                    if file_path is None:
+                        easygui.msgbox("Enter enter a file path next time")
+                        continue
+                    swift_client.upload_file(file_path)
+                    continue
+                elif button == "List Files":
+                    swift_client.list_files()
+                    continue
+                elif button == "Delete File":
+                    file_to_deleted = easygui.enterbox("Please the name for file to delete")
+                    if file_to_deleted is None:
+                        easygui.msgbox("Enter a file next time please")
+                        continue
+                    swift_client.delete_file(file_to_deleted)
+                    continue
+                elif button == "Download A File":
+                    file_name = easygui.enterbox("Please enter the file name you want to download")
+                    if file_name is None:
+                        easygui.msgbox("Please enter a file name next time")
+                        continue
+                    swift_client.get_file(file_name)
+                    continue
 
 
 def create_image_choiceboxes(images):
