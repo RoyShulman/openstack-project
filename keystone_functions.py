@@ -16,7 +16,7 @@ class Keystone:
             project_id = [x.id for x in self.keystone_client.tenants.list() if x.name == project_name]
             if project_id:
                 easygui.msgbox("Project with this name already exists!")
-                exit(1)
+                return "Name exists"
             else:
                 project_id = self.keystone_client.tenants.create(tenant_name=project_name,
                                                                  description=project_description).id
@@ -31,7 +31,7 @@ class Keystone:
                                                        project_name=project_name)
             if self.keystone_client is None:
                 easygui.msgbox("Wrong user name or password!")
-                exit(1)
+                return "Wrong User"
 
     def create_project(self, project_name, project_description):
         project_id = self.keystone_client.tenants.create(tenant_name=project_name,
