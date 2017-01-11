@@ -42,12 +42,17 @@ def main():
             keystone_client = Keystone(user_name=user_name,
                                        password=user_password, project_name=project_name,
                                        project_description=project_description)
+            if keystone_client == "Name Exists":
+                easygui.msgbox("Project with this name is already taken, try a different name")
+                continue
+            if keystone_client == "Username exists":
+                continue
             glance_client = Glance(keystone_session=keystone_client.sess)
             swift_client = Swift(keystone_session=keystone_client.sess)
             #print keystone_client.project_id
 
             while not exit:
-                choices = ["Create A Virtual Machine" "Access Virtual Machine" ,"Upload A File",
+                choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",
                            "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
                 button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
                 if button == "Exit":
@@ -62,7 +67,7 @@ def main():
                     url = nova_client.get_novnc_url(instance_name=instance)
                     if url == None:
                         continue
-                    easygui.msgbox(title="Instance URL", msg=url)
+                    easygui.msgbox(title="Instance URL and IP", msg=url + "\n" + nova_client.get_instance_IP(instance))
                     continue
                 elif button == "Upload A File":
                     file_path = easygui.enterbox("Please enter the full file path")
@@ -88,6 +93,12 @@ def main():
                         continue
                     swift_client.get_file(file_name)
                     continue
+                elif button == "Delete VM":
+                    instance_name = easygui.enterbox("Enter Instance Name")
+                    if instance_name is None:
+                        easygui.msgbox("Input a name next time please")
+                        continue
+                    nova_client.delete_instance(instance_name)
         if exit:
             continue
 
@@ -110,12 +121,14 @@ def main():
             keystone_client = Keystone(user_name=user_name,
                                        password=user_password,
                                        project_name=project_name)
+            if keystone_client == "Wrong User":
+                continue
             glance_client = Glance(keystone_session=keystone_client.sess)
             nova_client = Nova(keystone_session=keystone_client.sess)
             swift_client = Swift(keystone_session=keystone_client.sess)
 
             while not exit:
-                choices = ["Create A Virtual Machine" "Access Virtual Machine" ,"Upload A File",
+                choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",
                            "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
                 button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
                 if button == "Exit":
@@ -130,7 +143,7 @@ def main():
                     url = nova_client.get_novnc_url(instance_name=instance)
                     if url == None:
                         continue
-                    easygui.msgbox(title="Instance URL", msg=url)
+                    easygui.msgbox(title="Instance URL and IP", msg=url + "\n" + nova_client.get_instance_IP(instance))
                     continue
                 elif button == "Upload A File":
                     file_path = easygui.enterbox("Please enter the full file path")
@@ -156,6 +169,12 @@ def main():
                         continue
                     swift_client.get_file(file_name)
                     continue
+                elif button == "Delete VM":
+                    instance_name = easygui.enterbox("Enter Instance Name")
+                    if instance_name is None:
+                        easygui.msgbox("Input a name next time please")
+                        continue
+                    nova_client.delete_instance(instance_name)
 
 
 def create_image_choiceboxes(images):
@@ -172,7 +191,7 @@ def get_image_id(glance_client, image_name):
 def create_virtual_machine(glance_client, nova_client):
     image_names = create_image_choiceboxes(glance_client.list_images())
     chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
-    security_groups = nova_client.list_security_groups()
+    security_groups = [x.name for x in nova_client.list_security_groups()]
     chosen_security_group = easygui.choicebox("Available security groups: ", choices=security_groups)
     instance_name = easygui.enterbox("Please input your instance name")
     if instance_name == None:

@@ -16,12 +16,16 @@ class Keystone:
             project_id = [x.id for x in self.keystone_client.tenants.list() if x.name == project_name]
             if project_id:
                 easygui.msgbox("Project with this name already exists!")
-                return "Name exists"
+                exit(1)
             else:
                 project_id = self.keystone_client.tenants.create(tenant_name=project_name,
                                                                  description=project_description).id
                 #create the user associated with the tenant
                 user_id = self.add_user(name=user_name, password=password, project_id=project_id)
+                if user_id == "Username exists":
+                    easygui.msgbox("Project with this name is already taken, try a different name")
+                    self.keystone_client.tenants.delete(project_id)
+                    exit(1)
                 role = self.add_admin_role(project_id=project_id, user_id=user_id)
         else:
             #user wants to login to an existing project with his user name
@@ -31,7 +35,7 @@ class Keystone:
                                                        project_name=project_name)
             if self.keystone_client is None:
                 easygui.msgbox("Wrong user name or password!")
-                return "Wrong User"
+                exit(1)
 
     def create_project(self, project_name, project_description):
         project_id = self.keystone_client.tenants.create(tenant_name=project_name,
@@ -64,7 +68,7 @@ class Keystone:
             user_id = self.keystone_client.users.create(name=name, password=password, tenant_id=project_id)
         except exceptions.http.Conflict:
             easygui.msgbox("Username already taken!")
-            exit(1)
+            return "Username exists"
         return user_id
 
     def add_admin_role(self, project_id, user_id):

@@ -29,7 +29,7 @@ class Nova:
         image = self.nova_client.images.find(name=image_name)
         flavor = self.nova_client.flavors.find(name="m1.tiny")#because I am using VMs
         security_group_id = self.get_security_group(security_group_name)
-        instance = self.nova_client.servers.create(name=instance_name, image=image_name,
+        instance = self.nova_client.servers.create(name=instance_name, image=image,
                                                    flavor=flavor, key_name="mykey", security_group=security_group_id)
 
         status = instance.status
@@ -39,10 +39,8 @@ class Nova:
             status = instance.status
             print "Building"
 
-        floating_ip = self.create_floating_ip()
-
-        instance.add_floating_ip(floating_ip)
         print "Finished!"
+        return "Finished"
 
     def create_security_group(self):
         #default security group
@@ -71,12 +69,28 @@ class Nova:
         else:
             return instance_id[0]
 
-    def create_floating_ip(self):
-        return self.neutron_client.list_networks()["networks"]
+    def list_floating_ip(self):
+        return self.neutron_client.list_networks()
         #return type(self.nova_client.floating_ips.list())
 
     def get_novnc_url(self, instance_name):
         instance_id = self.get_instance(instance_name=instance_name)
         if instance_id == None:
             return
-        return self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]
+        url = self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]
+        print url
+        return url
+
+    def get_instance_IP(self, instance_name):
+        instance_id = self.get_instance(instance_name=instance_name)
+        instace = self.nova_client.servers.get(instance_id)
+        if instance_id == None:
+            return
+        return instance.servers.networks
+
+    def delete_instance(self, instance_name):
+        try:
+            self.nova_client.servers.delete(instance_name)
+        except Exception, e:
+            print e
+            easygui.msgbox("Something went wrong")
