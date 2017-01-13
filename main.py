@@ -3,6 +3,7 @@ from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
 from swift_functions import Swift
+from cinder_functions import Cinder
 
 
 
@@ -59,9 +60,15 @@ def main():
                     exit = True
                     break
                 if button == "Create A Virtual Machine":
-                    if create_virtual_machine(glance_client, nova_client) is None:
+                    instance_name = create_virtual_machine(glance_client, nova_client)
+                    if instance_name is None:
                         easygui.msgbox("Failed to create virtual machine")
                         continue
+                    answer = easygui.buttonbox("Would you like to add a hard drive to your machine?",
+                                      choices=["Yes", "No"])
+                    if answer == "Yes":
+                        cinder_client.create_volume(name=instance_name + "Volume")
+                        cinder_client.attach_volume(nova_client.get_instance(instance_name), instance_name)
                 elif button == "Access Virtual Machine":
                     instance = choose_instance(nova_client)
                     url = nova_client.get_novnc_url(instance_name=instance)
@@ -126,7 +133,7 @@ def main():
             glance_client = Glance(keystone_session=keystone_client.sess)
             nova_client = Nova(keystone_session=keystone_client.sess)
             swift_client = Swift(keystone_session=keystone_client.sess)
-
+            cinder_client = Cinder(keystone_session=keystone_client.sess)
             while not exit:
                 choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",
                            "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
@@ -135,9 +142,15 @@ def main():
                     exit = True
                     break
                 if button == "Create A Virtual Machine":
-                    if create_virtual_machine(glance_client, nova_client) is None:
+                    instance_name = create_virtual_machine(glance_client, nova_client)
+                    if instance_name is None:
                         easygui.msgbox("Failed to create virtual machine")
                         continue
+                    answer = easygui.buttonbox("Would you like to add a hard drive to your machine?",
+                                      choices=["Yes", "No"])
+                    if answer == "Yes":
+                        cinder_client.create_volume(name=instance_name + "Volume")
+                        cinder_client.attach_volume(nova_client.get_instance(instance_name), instance_name)
                 elif button == "Access Virtual Machine":
                     instance = choose_instance(nova_client)
                     url = nova_client.get_novnc_url(instance_name=instance)
@@ -199,7 +212,7 @@ def create_virtual_machine(glance_client, nova_client):
         return None
     nova_client.create_instance(image_name=chosen_image_name, instance_name=instance_name,
                                 security_group_name=chosen_security_group)
-
+    return chosen_image_name
 def choose_instance(nova_client):
     instances = [x.name for x in nova_client.list_servers()]
     instance_name = easygui.choicebox(msg="Select the instance you want", choices=instances)
