@@ -3,9 +3,13 @@ from swiftclient import ClientException
 import easygui
 from exceptions import IOError
 import os
+from keystone_functions import Keystone
+import constants
+
 class Swift:
-    def __init__(self, keystone_session):
-        self.swift_client = SwiftClient.Connection(session=keystone_session)
+    def __init__(self):
+        self.swift_client = SwiftClient.Connection(session=Keystone(constants.ADMIN_USERNAME, constants.ADMIN_PASSWORD,
+                                                                    constants.ADMIN_TENANT).sess)
         self.account = self.swift_client.get_account()
         self.container = self.account[1][0]
 
@@ -30,7 +34,7 @@ class Swift:
         try:
             files = self.swift_client.get_container(self.container['name'])[1]
             for file in files:
-                return_files.append(file["name"])
+                return_files.append(file["name"] + " |")
 
             s = " ".join(return_files)
             easygui.msgbox(str(s))

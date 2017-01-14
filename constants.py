@@ -1,13 +1,11 @@
 #This is the projects constants file
 
-
 #ADMIN CREDENTIALS FOR PROJECT
 ADMIN_AUTH_URL = "http://192.168.1.164:35357/v2.0"
 ADMIN_TOKEN = "f363e22443526541b7a5"
 ADMIN_PASSWORD = "password"
 ADMIN_USERNAME = "admin"
 ADMIN_TENANT = "admin"
-
 
 #CONSTANT IP
 KEYSTONE_API_VERSION = 'v2.0'

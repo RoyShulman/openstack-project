@@ -49,7 +49,7 @@ def main():
             if keystone_client == "Username exists":
                 continue
             glance_client = Glance(keystone_session=keystone_client.sess)
-            swift_client = Swift(keystone_session=keystone_client.sess)
+            swift_client = Swift()
             #print keystone_client.project_id
 
             while not exit:
@@ -132,7 +132,7 @@ def main():
                 continue
             glance_client = Glance(keystone_session=keystone_client.sess)
             nova_client = Nova(keystone_session=keystone_client.sess)
-            swift_client = Swift(keystone_session=keystone_client.sess)
+            swift_client = Swift()
             cinder_client = Cinder(keystone_session=keystone_client.sess)
             while not exit:
                 choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",

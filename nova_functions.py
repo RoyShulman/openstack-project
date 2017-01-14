@@ -79,14 +79,14 @@ class Nova:
             return
         url = self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]
         print url
-        return url
+        return str(url)
 
     def get_instance_IP(self, instance_name):
         instance_id = self.get_instance(instance_name=instance_name)
         instance = self.nova_client.servers.get(instance_id)
         if instance_id == None:
             return
-        return instance.servers.networks
+        return str(instance.networks)
 
     def delete_instance(self, instance_name):
         try:
