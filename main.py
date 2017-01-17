@@ -5,7 +5,7 @@ from nova_functions import Nova
 from swift_functions import Swift
 from cinder_functions import Cinder
 
-
+#TODO: add floating ip to instances
 
 def main():
     while True:

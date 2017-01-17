@@ -1,5 +1,6 @@
-from novaclient import client as novaClient
+from novaclient.v2 import client as novaClient
 from neutron_functions import  Neutron
+from cinder_functions import Cinder
 import constants
 import os
 import time
@@ -11,6 +12,7 @@ class Nova:
     def __init__(self, keystone_session):
         self.nova_client = novaClient.Client(version="2", session=keystone_session, auth_url=constants.ADMIN_AUTH_URL)
         self.neutron_client = Neutron(keystone_session=keystone_session)
+        self.cinder_client = Cinder(keystone_session=keystone_session)
 
     def list_servers(self):
         try:
@@ -89,8 +91,19 @@ class Nova:
         return str(instance.networks)
 
     def delete_instance(self, instance_name):
+        """
+        Delete the instance and it's volume given by the instance name
+        :param instance_name: the name of the instance to be deleted
+        :return
+        """
         try:
+            instance_id = self.get_instance(instance_name=instance_name)
+            if instance_id is None:
+                return
+            self.nova_client.volumes.delete_server_volume(instance_id,
+                                                          self.cinder_client.get_volume_id(instance_name + "Volume"))
             self.nova_client.servers.delete(instance_name)
         except Exception, e:
             print e
             easygui.msgbox("Something went wrong")
+
