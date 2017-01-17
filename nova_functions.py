@@ -15,16 +15,31 @@ class Nova:
         self.cinder_client = Cinder(keystone_session=keystone_session)
 
     def list_servers(self):
+        """
+        List all instances
+        :return: all available instances
+        """
         try:
             return self.nova_client.servers.list()
         except Exception,e:
             print e
 
     def delete_instance(self, instance_name):
+        """
+        Terminates an instance and deletes it
+        :param instance_name: Name of the instance to be deleted
+        """
         instance = self.nova_client.servers.find(name=instance_name)
         instance.delete()
 
     def create_instance(self, image_name, instance_name, security_group_name):
+        """
+        Create an instance
+        :param image_name: Name of the image to boot from
+        :param instance_name: The name to give to the instance
+        :param security_group_name: The security group to add to the instance
+        :return: Returns a Finished string
+        """
         if not self.nova_client.keypairs.findall(name="mykey"):
             with open(os.path.expanduser('~/.ssh/id_rsa.pub')) as fpubkey:
                 self.nova_client.keypairs.create(name="mykey", public_key=fpubkey.read())
@@ -45,7 +60,10 @@ class Nova:
         return "Finished"
 
     def create_security_group(self):
-        #default security group
+        """
+        Create a default security group
+        :return: novaclient.v2.security_group
+        """
         security_group = self.nova_client.security_groups.find(name="default")
         self.nova_client.security_groups_rules.create(security_group.id, ip_protocol="tcp",
                                                 from_port=22, to_port=22)#SSH
@@ -57,6 +75,10 @@ class Nova:
         return self.nova_client.security_groups.find(name=security_group_name)
 
     def list_security_groups(self):
+        """
+        List the security groups in a tenant
+        :return: List of the available security groups
+        """
         try:
             return self.nova_client.security_groups.list()
         except Exception, e:
@@ -64,6 +86,11 @@ class Nova:
             return
 
     def get_instance(self, instance_name):
+        """
+        Returns The unique instance ID of a given instance
+        :param Instance_name: the name of the instance
+        :return: String of the instance ID
+        """
         instance_id = [x.id for x in self.list_servers() if x.name == instance_name]
         if instance_id == []:
             easygui.msgbox("Instance name could not be found")
@@ -76,6 +103,11 @@ class Nova:
         #return type(self.nova_client.floating_ips.list())
 
     def get_novnc_url(self, instance_name):
+        """
+        Return a URL for a NoVNC console of a given instance
+        :param instance_name: Name of the instance
+        :return: string of the NoVNC URL
+        """
         instance_id = self.get_instance(instance_name=instance_name)
         if instance_id == None:
             return
@@ -84,6 +116,11 @@ class Nova:
         return str(url)
 
     def get_instance_IP(self, instance_name):
+        """
+        Returns the IP address of a given instance
+        :param instance_name: the name of the instance
+        :return: returns a string of the instance IP address
+        """
         instance_id = self.get_instance(instance_name=instance_name)
         instance = self.nova_client.servers.get(instance_id)
         if instance_id == None:
@@ -94,7 +131,7 @@ class Nova:
         """
         Delete the instance and it's volume given by the instance name
         :param instance_name: the name of the instance to be deleted
-        :return
+        :return does not return a value
         """
         try:
             instance_id = self.get_instance(instance_name=instance_name)
