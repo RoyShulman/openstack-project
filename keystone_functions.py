@@ -38,6 +38,12 @@ class Keystone:
                 exit(1)
 
     def create_project(self, project_name, project_description):
+        """
+        Create a new tenant
+        :param project_name: The name of the project(Tenant) to create
+        :param project_description: The description for the project
+        :return: The unique ID of the newly created project(String type)
+        """
         project_id = self.keystone_client.tenants.create(tenant_name=project_name,
                                                          description=project_description,
                                                          enabled=True)
@@ -45,7 +51,15 @@ class Keystone:
 
     def password_login(self, auth_url=constants.ADMIN_AUTH_URL, username=constants.ADMIN_USERNAME,
                        password=constants.ADMIN_PASSWORD, project_name=constants.ADMIN_TENANT):
-        """return a keystone keystoneClient by authenticating with password"""
+        """
+        Login to keystone and create a keystone object.
+        If no parameters are passed logs in using admin credentials
+        :param auth_url: Url endpoint to connect to
+        :param username: The username to login with
+        :param password: The password to login with
+        :param project_name: Name of the project to login to
+        :return: a keystone client object
+        """
         auth = v2.Password(auth_url=auth_url, username=username, password=password, tenant_name=project_name)
         self.sess = session.Session(auth=auth)
         keystone_client = keystoneClient.Client(session=self.sess)
@@ -63,7 +77,13 @@ class Keystone:
         return keystone_client
 
     def add_user(self, name, password, project_id):
-        """function to add a new user to a project"""
+        """
+        Add a user to a given project
+        :param name: Name of the user to create
+        :param password: The password to give to the user
+        :param project_id: The unique ID for the project to associate the user to
+        :return: The unique ID of the newly created user
+        """
         try:
             user_id = self.keystone_client.users.create(name=name, password=password, tenant_id=project_id)
         except exceptions.http.Conflict:
@@ -72,13 +92,31 @@ class Keystone:
         return user_id
 
     def add_admin_role(self, project_id, user_id):
-        admin_role = [x.id for x in self.keystone_client.roles.list() if x.name == "admin"][0]
-        role = self.keystone_client.roles.add_user_role(user=user_id, role=admin_role, tenant=project_id)
-        return role
+        """
+        Associate a user with the admin role
+        :param project_id: The unique ID of the project the user is associated with
+        :param user_id: The unique ID of the user
+        :return: Return the unique ID of the role
+        """
+        try:
+            admin_role = [x.id for x in self.keystone_client.roles.list() if x.name == "admin"][0]
+            role = self.keystone_client.roles.add_user_role(user=user_id, role=admin_role, tenant=project_id)
+            return role
+        except Exception, e:
+            easygui.msgbox("Something went wrong please try again")
+            print e
+            return
 
     def list_projects(self):
-        #function to list on tenants(projects)
-        return keystoneClient.tenants.list()
-
+        """
+        List all available tenants
+        :return: List of all projects(Tenants)
+        """
+        try:
+            return keystoneClient.tenants.list()
+        except Exception, e:
+            easygui.msgbox("Something went wrong please try again")
+            print e
+            return
 
 
