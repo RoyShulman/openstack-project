@@ -188,6 +188,10 @@ def main():
                         easygui.msgbox("Input a name next time please")
                         continue
                     nova_client.delete_instance(instance_name)
+        elif button == "System Admin":
+            exit = False
+            while not exit:
+                handle_system_admin()
 
 
 def create_image_choiceboxes(images):
@@ -218,6 +222,27 @@ def choose_instance(nova_client):
     instance_name = easygui.choicebox(msg="Select the instance you want", choices=instances)
     return instance_name
 
+def handle_system_admin():
+    keystone_client = Keystone(system_admin=True)
+    nova_client = Nova(keystone_session=keystone_client.sess)
+    choices = ["Show logs for all instances", "Show logs for a tenant"]
+    button = easygui.buttonbox("Choose an option", choices=choices)
+    if button == "Show log for all instances":
+        show_all_instances_log(nova_client)
+    elif button == "Show logs for a tenant":
+        show_tenant_log()
+
+
+def show_all_instances_log(nova_client, keystone_client):
+    usage = nova_client.get_usage(all_instances=True)
+    if usage is not None:
+        easygui.msgbox(usage)
+
+def show_tenant_log(nova_client, keystone_client):
+        tenant_chosen = choose_tenant(keystone_client=keystone_client)
+        usage = nova_client.get_usage(all_instances=False, chosen_instance=instance_chosen)
+
+def choose_tenant():
 
 
 if __name__ == "__main__":

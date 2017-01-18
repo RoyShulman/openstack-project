@@ -5,6 +5,7 @@ import constants
 import os
 import time
 import easygui
+import datetime
 
 
 
@@ -143,4 +144,17 @@ class Nova:
         except Exception, e:
             print e
             easygui.msgbox("Something went wrong")
+
+
+    def get_usage(self, all_instances, chosen_tenant):
+        if all_instances:
+            try:
+                return self.nova_client.usage.list(datetime.date.min, datetime.date.today(), detailed=True)
+            except Exception, e:
+                easygui.msgbox("Something went wrong please try again")
+                print e
+                return None
+        else:
+            try:
+                return self.nova_client.usage.get()
 

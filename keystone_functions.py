@@ -7,7 +7,7 @@ import constants
 
 
 class Keystone:
-    def __init__(self, user_name, password, project_name, project_description = None):
+    def __init__(self, user_name, password, project_name, project_description = None, system_admin = None):
         #session to be used inside keystone
         self.sess = None
         if project_description is not None:
@@ -27,6 +27,12 @@ class Keystone:
                     self.keystone_client.tenants.delete(project_id)
                     exit(1)
                 role = self.add_admin_role(project_id=project_id, user_id=user_id)
+
+        elif system_admin:
+            #SYSTEM ADMIN LOGGING ON
+            self.keystone_client = self.password_login()
+
+
         else:
             #user wants to login to an existing project with his user name
             self.keystone_client = self.password_login(auth_url=constants.ADMIN_AUTH_URL,
@@ -36,6 +42,7 @@ class Keystone:
             if self.keystone_client is None:
                 easygui.msgbox("Wrong user name or password!")
                 exit(1)
+
 
     def create_project(self, project_name, project_description):
         """
