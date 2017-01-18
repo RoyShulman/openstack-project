@@ -152,7 +152,7 @@ class Nova:
         if all_instances:
             try:
                 return self.nova_client.usage.list(start=datetime.datetime.min,
-                                                   end=datetime.datetime.now(), detailed=True)
+                                                   end=datetime.datetime.now(), detailed=True).to_dict()
             except Exception, e:
                 easygui.msgbox("Something went wrong please try again")
                 print e
@@ -160,7 +160,7 @@ class Nova:
         else:
             try:
                 return self.nova_client.usage.get(start=datetime.datetime.min,
-                                                  end=datetime.datetime.now(), tenant_id=chosen_tenant)
+                                                  end=datetime.datetime.now(), tenant_id=chosen_tenant).to_dict()
             except Exception, e:
                 print e
                 easygui.msgbox("Something went wrong please try again")

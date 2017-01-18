@@ -11,7 +11,7 @@ from cinder_functions import Cinder
 
 def main():
     while True:
-        exit = False
+        Exit = False
         title = "Openstack Virtualization Platform"
         choices = ["New project", "Existing project", "System Admin", "Exit"]
         button = easygui.buttonbox("Choose an option", title=title, choices=choices)
@@ -54,12 +54,12 @@ def main():
             swift_client = Swift()
             #print keystone_client.project_id
 
-            while not exit:
+            while not Exit:
                 choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",
                            "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
                 button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
                 if button == "Exit":
-                    exit = True
+                    Exit = True
                     break
                 if button == "Create A Virtual Machine":
                     instance_name = create_virtual_machine(glance_client, nova_client)
@@ -108,7 +108,7 @@ def main():
                         easygui.msgbox("Input a name next time please")
                         continue
                     nova_client.delete_instance(instance_name)
-        if exit:
+        if Exit:
             continue
 
 
@@ -136,12 +136,12 @@ def main():
             nova_client = Nova(keystone_session=keystone_client.sess)
             swift_client = Swift()
             cinder_client = Cinder(keystone_session=keystone_client.sess)
-            while not exit:
+            while not Exit:
                 choices = ["Create A Virtual Machine", "Access Virtual Machine", "Delete VM","Upload A File",
                            "List Files", "Download A File", "Upload Image File","Delete File", "Exit"]
                 button = easygui.buttonbox(msg="What do you want to do?", choices=choices)
                 if button == "Exit":
-                    exit = True
+                    Exit = True
                     break
                 if button == "Create A Virtual Machine":
                     instance_name = create_virtual_machine(glance_client, nova_client)
@@ -191,7 +191,7 @@ def main():
                         continue
                     nova_client.delete_instance(instance_name)
         elif button == "System Admin":
-            exit = False
+            Exit = False
             username = easygui.enterbox("Enter your username")
             if username is None:
                 easygui.msgbox("Enter a username next time")
@@ -201,8 +201,8 @@ def main():
                 easygui.msgbox("Please enter your password next time please")
 
             if username == constants.SYSTEM_ADMIN_USERNAME and password == constants.SYSTEM_ADMIN_PASSWORD:
-                while not exit:
-                    exit = handle_system_admin()
+                while not Exit:
+                    Exit = handle_system_admin()
             else:
                 easygui.msgbox("Username or password incorrect please try again")
                 continue
