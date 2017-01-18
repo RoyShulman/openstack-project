@@ -1,4 +1,6 @@
 import easygui
+import constants
+
 from keystone_functions import Keystone
 from glance_functions import Glance
 from nova_functions import Nova
@@ -11,7 +13,7 @@ def main():
     while True:
         exit = False
         title = "Openstack Virtualization Platform"
-        choices = ["New project", "Existing project", "Exit"]
+        choices = ["New project", "Existing project", "System Admin", "Exit"]
         button = easygui.buttonbox("Choose an option", title=title, choices=choices)
         if button == "Exit":
             exit(1)
@@ -190,8 +192,20 @@ def main():
                     nova_client.delete_instance(instance_name)
         elif button == "System Admin":
             exit = False
-            while not exit:
-                handle_system_admin()
+            username = easygui.enterbox("Enter your username")
+            if username is None:
+                easygui.msgbox("Enter a username next time")
+                continue
+            password = easygui.enterbox("Enter your password")
+            if password is None:
+                easygui.msgbox("Please enter your password next time please")
+
+            if username == constants.SYSTEM_ADMIN_USERNAME and password == constants.SYSTEM_ADMIN_PASSWORD:
+                while not exit:
+                    exit = handle_system_admin()
+            else:
+                easygui.msgbox("Username or password incorrect please try again")
+                continue
 
 
 def create_image_choiceboxes(images):
@@ -205,6 +219,7 @@ def get_image_id(glance_client, image_name):
         if image.name == image_name:
             return image.id
 
+
 def create_virtual_machine(glance_client, nova_client):
     image_names = create_image_choiceboxes(glance_client.list_images())
     chosen_image_name = easygui.choicebox("Available images: ", choices=image_names)
@@ -217,33 +232,44 @@ def create_virtual_machine(glance_client, nova_client):
     nova_client.create_instance(image_name=chosen_image_name, instance_name=instance_name,
                                 security_group_name=chosen_security_group)
     return chosen_image_name
+
+
 def choose_instance(nova_client):
     instances = [x.name for x in nova_client.list_servers()]
     instance_name = easygui.choicebox(msg="Select the instance you want", choices=instances)
     return instance_name
 
+
 def handle_system_admin():
     keystone_client = Keystone(system_admin=True)
     nova_client = Nova(keystone_session=keystone_client.sess)
-    choices = ["Show logs for all instances", "Show logs for a tenant"]
+    choices = ["Show logs for all instances", "Show logs for a tenant", "Exit"]
     button = easygui.buttonbox("Choose an option", choices=choices)
-    if button == "Show log for all instances":
+    if button == "Show logs for all instances":
         show_all_instances_log(nova_client)
     elif button == "Show logs for a tenant":
-        show_tenant_log()
+        show_tenant_log(nova_client=nova_client, keystone_client=keystone_client)
+    elif button == "Exit":
+        return True
 
 
-def show_all_instances_log(nova_client, keystone_client):
+def show_all_instances_log(nova_client):
     usage = nova_client.get_usage(all_instances=True)
+    print usage
     if usage is not None:
         easygui.msgbox(usage)
 
+
 def show_tenant_log(nova_client, keystone_client):
         tenant_chosen = choose_tenant(keystone_client=keystone_client)
-        usage = nova_client.get_usage(all_instances=False, chosen_instance=instance_chosen)
+        usage = nova_client.get_usage(all_instances=False, chosen_tenant=tenant_chosen)
+        easygui.msgbox(usage)
 
-def choose_tenant():
 
+def choose_tenant(keystone_client):
+    tenants = [x.name for x in keystone_client.list_projects()]
+    tenant_name = easygui.choicebox(msg="Select the tenant you want", choices=tenants)
+    return tenant_name
 
 if __name__ == "__main__":
     main()

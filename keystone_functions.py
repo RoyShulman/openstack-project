@@ -7,7 +7,8 @@ import constants
 
 
 class Keystone:
-    def __init__(self, user_name, password, project_name, project_description = None, system_admin = None):
+    def __init__(self, user_name = None, password = None,
+                 project_name = None , project_description = None, system_admin = None):
         #session to be used inside keystone
         self.sess = None
         if project_description is not None:
@@ -120,10 +121,19 @@ class Keystone:
         :return: List of all projects(Tenants)
         """
         try:
-            return keystoneClient.tenants.list()
+            return self.keystone_client.tenants.list()
         except Exception, e:
             easygui.msgbox("Something went wrong please try again")
             print e
             return
+
+    def get_tenant(self, tenant_name):
+        try:
+            tenant = [x.id for x in self.list_projects() if tenant_name == x.name]
+            if tenant is not None:
+                return self.keystone_client.tenants.get(tenant[0])
+        except Exception, e:
+            print e
+            easygui.msgbox("Something went wrong please try again")
 
 

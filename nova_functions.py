@@ -1,6 +1,8 @@
-from novaclient.v2 import client as novaClient
+from novaclient import client as novaClient
 from neutron_functions import  Neutron
 from cinder_functions import Cinder
+from novaclient.exceptions import Conflict
+
 import constants
 import os
 import time
@@ -112,6 +114,7 @@ class Nova:
         instance_id = self.get_instance(instance_name=instance_name)
         if instance_id == None:
             return
+        self.active_instance(instance_id=instance_id)
         url = self.nova_client.servers.get_vnc_console(instance_id, 'novnc')["console"]["url"]
         print url
         return str(url)
@@ -145,16 +148,28 @@ class Nova:
             print e
             easygui.msgbox("Something went wrong")
 
-
-    def get_usage(self, all_instances, chosen_tenant):
+    def get_usage(self, all_instances, chosen_tenant = None):
         if all_instances:
             try:
-                return self.nova_client.usage.list(datetime.date.min, datetime.date.today(), detailed=True)
+                return self.nova_client.usage.list(start=datetime.datetime.min,
+                                                   end=datetime.datetime.now(), detailed=True)
             except Exception, e:
                 easygui.msgbox("Something went wrong please try again")
                 print e
                 return None
         else:
             try:
-                return self.nova_client.usage.get()
+                return self.nova_client.usage.get(start=datetime.datetime.min,
+                                                  end=datetime.datetime.now(), tenant_id=chosen_tenant)
+            except Exception, e:
+                print e
+                easygui.msgbox("Something went wrong please try again")
+                return None
 
+
+    def active_instance(self, instance_id):
+        instance = self.nova_client.servers.get(instance_id)
+        try:
+            instance.start()
+        except Conflict:
+            pass
