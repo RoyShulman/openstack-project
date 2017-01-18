@@ -75,6 +75,11 @@ class Nova:
         return security_group
 
     def get_security_group(self, security_group_name):
+        """
+        Return a security group object by a given name
+        :param security_group_name: Name of the security group
+        :return: Nova client security group object
+        """
         return self.nova_client.security_groups.find(name=security_group_name)
 
     def list_security_groups(self):
@@ -149,6 +154,12 @@ class Nova:
             easygui.msgbox("Something went wrong")
 
     def get_usage(self, all_instances, chosen_tenant = None):
+        """
+        Get a dictionary containing usage for a specific tenant or all of them
+        :param all_instances: Boolean if to return usage for all instances
+        :param chosen_tenant: Unique ID of the tenant to return the usage of
+        :return: Dictionary containing usage information
+        """
         if all_instances:
             try:
                 return self.nova_client.usage.list(start=datetime.datetime.min,
@@ -168,6 +179,10 @@ class Nova:
 
 
     def active_instance(self, instance_id):
+        """
+        Start an inactive instance. If active do nothing
+        :param instance_id: The unique ID of the instance to activate
+        """
         instance = self.nova_client.servers.get(instance_id)
         try:
             instance.start()
